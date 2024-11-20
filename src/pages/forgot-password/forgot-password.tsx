@@ -1,4 +1,4 @@
-import { FC, useState, SyntheticEvent } from 'react';
+import { FC, useState, SyntheticEvent, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { forgotPasswordApi } from '@api';
@@ -10,17 +10,23 @@ export const ForgotPassword: FC = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e: SyntheticEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    (e: SyntheticEvent) => {
+      e.preventDefault();
+      if (!email) {
+        return;
+      }
 
-    setError(null);
-    forgotPasswordApi({ email })
-      .then(() => {
-        localStorage.setItem('resetPassword', 'true');
-        navigate('/reset-password', { replace: true });
-      })
-      .catch((err) => setError(err));
-  };
+      setError(null);
+      forgotPasswordApi({ email })
+        .then(() => {
+          localStorage.setItem('resetPassword', 'true');
+          navigate('/reset-password', { replace: true });
+        })
+        .catch((err) => setError(err));
+    },
+    [email]
+  );
 
   return (
     <ForgotPasswordUI
